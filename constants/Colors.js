@@ -6,9 +6,9 @@ export const Colors = {
         text: '#FFFFFF',
         title: '#fff',
         background: '#12121A',
-        navBackground: '#201e2b',
+        navBackground: '#0B0B0F', //for tab
         iconColour: '#F8F6FA',
-        iconColourFocused: '#B5B5FF',
+        iconColourFocused: '#FFFFFF',
         uiBackground: '#12121E'
     },
     light: {
