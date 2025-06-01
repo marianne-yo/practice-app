@@ -16,14 +16,18 @@ const Home = () => {
       <ThemedText style={styles.title}>Revio</ThemedText>
 
       <Spacer height={10}/>
-      <ThemedText styles={styles.quote}>"Study, Learn, Revio"</ThemedText>
+      <ThemedText style={styles.quote}>"Study, Learn, Revio"</ThemedText>
       <Spacer height={10}/>
 
-      <Link href="/about">
-        <ThemedText style={styles.link}>About Page</ThemedText>
+      <Link href="/login" styles={styles.link}>
+        <ThemedText style={styles.link}>Login Page</ThemedText>
       </Link>
-      <Link href="/contact" style={styles.link}>
-        <ThemedText style={styles.link}>Contact Page</ThemedText>
+      <Link href="/signup" style={styles.link}>
+        <ThemedText style={styles.link}>Signup Page</ThemedText>
+      </Link>
+
+      <Link href="/profile" style={styles.link}>
+        <ThemedText style={styles.link}>Profile Page</ThemedText>
       </Link>
     </ThemedView>
   )
@@ -49,6 +53,6 @@ const styles = StyleSheet.create({
     link:{
         fontWeight: 'bold',
         marginVertical: 10,
-        color: 'gray'
+        color: 'white'
     }
 })
