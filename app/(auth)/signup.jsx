@@ -12,6 +12,7 @@ import { useState } from 'react'
 
 const signup = () => {
     const [email, setEmail] = useState('')
+    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
 
     const handleSubmit = () => {
@@ -29,11 +30,20 @@ const signup = () => {
 
             <ThemedTextInput 
                 style={{ width: '80%', marginBottom: 20}}
+                placeholder="Username"
+                keyboardType="default"
+                onChangeText={setUsername}
+                value={username}
+            />
+
+            <ThemedTextInput 
+                style={{ width: '80%', marginBottom: 20}}
                 placeholder="Email"
                 keyboardType="email-address"
                 onChangeText={setEmail}
                 value={email}
             />
+
 
             <ThemedTextInput 
                 style={{ width: '80%', marginBottom: 20}}
