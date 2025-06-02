@@ -17,8 +17,9 @@ const styles = StyleSheet.create({
     btn:{
         backgroundColor: Colors.primary,
         padding: 10,
-        borderRadius: 6,
-        marginVertical: 10
+        borderRadius: 20,
+        marginVertical: 10,
+        width: '80%',
     },
     pressed:{
         opacity: 0.5
