@@ -119,7 +119,7 @@ const Login = () => {
                 </ThemedButton>
                 )}
 
-                <Spacer height={100} />
+                <Spacer height={40} />
                 <Link href='/Signup'>
                     <ThemedText style={{ textAlign: 'center' }}>
                         Signup instead
