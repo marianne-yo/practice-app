@@ -2,10 +2,20 @@ import { Tabs } from "expo-router"
 import { useColorScheme } from "react-native"
 import { Colors } from "../../constants/Colors"
 import { Ionicons } from "@expo/vector-icons"
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function DashboardLayout() {
   const colorScheme = useColorScheme()
   const theme = Colors[colorScheme] ?? Colors.light
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user || !user.emailVerified) {
+        router.replace('/Login'); // kick them back to auth
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   return (
     <Tabs

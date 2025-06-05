@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '../../lib/firebaseConfig';
+import { sendEmailVerification } from 'firebase/auth';
 //themed imports
 import ThemedView from '../../component/ThemedView';
 import Spacer from '../../component/Spacer';
@@ -20,6 +21,8 @@ const Login = () => {
     const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false);
+    const [unverifiedUser, setUnverifiedUser] = useState(null);
+
 
     const handleSubmit = async () => {
         if (!emailOrUsername || !password) {
@@ -29,7 +32,7 @@ const Login = () => {
 
         let loginEmail = emailOrUsername;
 
-        // If it's not an email, look up the username
+        // If it's not an email, looks up the username
         const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailOrUsername);
         if (!isEmail) {
             try {
@@ -52,13 +55,10 @@ const Login = () => {
         const userCredential = await signInWithEmailAndPassword(auth, loginEmail, password);
 
         if (!userCredential.user.emailVerified) {
-            Alert.alert(
-            "Email Not Verified",
-            "Please verify your email before logging in."
-            );
+            setUnverifiedUser(userCredential.user); // save user for resend
+            Alert.alert("Email Not Verified", "Please verify your email before logging in.");
             return;
         }
-
         // Alert.alert('Success', `Welcome ${userCredential.user.email}`);
         router.replace('/profile');
         } catch (err) {
@@ -101,6 +101,23 @@ const Login = () => {
                 <ThemedButton onPress={handleSubmit}>
                     <Text style={styles.buttonText}>Login</Text>
                 </ThemedButton>
+
+                {unverifiedUser && (
+                <ThemedButton
+                    onPress={async () => {
+                    try {
+                        await sendEmailVerification(unverifiedUser);
+                        Alert.alert("Verification Email Sent", "Please check your inbox.");
+                    } catch (err) {
+                        Alert.alert("Error", "Could not send verification email.");
+                        console.error("Resend verification error:", err.message);
+                    }
+                    }}
+                    style={{ marginTop: 20 }}
+                >
+                    <Text style={styles.buttonText}>Resend Verification Email</Text>
+                </ThemedButton>
+                )}
 
                 <Spacer height={100} />
                 <Link href='/Signup'>
