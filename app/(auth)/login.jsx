@@ -1,9 +1,13 @@
 import { StyleSheet, Text, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
+//icon imports
+import { Ionicons } from '@expo/vector-icons';
+//firebase imports
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../lib/firebaseConfig';
-
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { auth, db } from '../../lib/firebaseConfig';
+//themed imports
 import ThemedView from '../../component/ThemedView';
 import Spacer from '../../component/Spacer';
 import ThemedText from '../../component/ThemedText';
@@ -11,19 +15,55 @@ import ThemedButton from '../../component/ThemedButton';
 import ThemedTextInput from '../../component/ThemedTextInput';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const [emailOrUsername, setEmailOrUsername] = useState('');
     const [password, setPassword] = useState('');
     const router = useRouter();
 
+    const [showPassword, setShowPassword] = useState(false);
+
     const handleSubmit = async () => {
+        if (!emailOrUsername || !password) {
+            Alert.alert('Missing fields', 'Please enter all fields');
+            return;
+        }
+
+        let loginEmail = emailOrUsername;
+
+        // If it's not an email, look up the username
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailOrUsername);
+        if (!isEmail) {
+            try {
+                const q = query(collection(db, 'users'), where('username', '==', emailOrUsername.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) {
+                    Alert.alert('Login Failed', 'Username not found');
+                    return;
+                }
+                loginEmail = querySnapshot.docs[0].data().email;
+            } catch (err) {
+                console.error('Username lookup error:', err);
+                Alert.alert('Login Failed', 'Could not find matching user');
+                return;
+            }
+        }
+
+        // Try logging in with the email
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            console.log("User logged in:", userCredential.user.email);
-            Alert.alert("Welcome Back", `Logged in as ${userCredential.user.email}`);
-            router.replace('/books'); // Or wherever your home screen is
-        } catch (error) {
-            console.error("Login error:", error.message);
-            Alert.alert("Login Failed", error.message);
+        const userCredential = await signInWithEmailAndPassword(auth, loginEmail, password);
+
+        if (!userCredential.user.emailVerified) {
+            Alert.alert(
+            "Email Not Verified",
+            "Please verify your email before logging in."
+            );
+            return;
+        }
+
+        // Alert.alert('Success', `Welcome ${userCredential.user.email}`);
+        router.replace('/profile');
+        } catch (err) {
+        console.error('Login error:', err.message);
+        Alert.alert('Login Failed', err.message);
         }
     };
 
@@ -37,18 +77,25 @@ const Login = () => {
 
                 <ThemedTextInput 
                     style={{ width: '80%', marginBottom: 20 }}
-                    placeholder="Email"
-                    keyboardType="email-address"
-                    onChangeText={setEmail}
-                    value={email}
+                    placeholder="Email or Username"
+                    onChangeText={setEmailOrUsername}
+                    value={emailOrUsername}
                 />
 
                 <ThemedTextInput 
-                    style={{ width: '80%', marginBottom: 20 }}
-                    placeholder="Password"
-                    onChangeText={setPassword}
-                    value={password}
-                    secureTextEntry
+                style={{ width: '80%', marginBottom: 20 }}
+                placeholder="Password"
+                onChangeText={setPassword}
+                value={password}
+                secureTextEntry={!showPassword}
+                rightIcon={
+                    <Ionicons 
+                    name={showPassword ? 'eye-off' : 'eye'} 
+                    size={20} 
+                    color="gray" 
+                    onPress={() => setShowPassword(prev => !prev)} 
+                    />
+                }
                 />
 
                 <ThemedButton onPress={handleSubmit}>
